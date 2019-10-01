@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Billiards</title>
+    <link rel="stylesheet" href="index.css"></link>
+
+    <script src="index.js" type="module" defer></script>
+    <script src="logic.js" type="module" defer></script>
+    <script src="renderer.js" type="module" defer></script>
+  </head>
+
+  <body>
+    <div id="container">
+      <h1>Billiards</h1>
+      <div id="controls">
+        <div>
+          <div class="group">
+            <label for="width">Width</label>
+            <input type="number" id="width" min="1" max="20" value="2" minlength="1">
+
+            <label for="height">Height</label>
+            <input type="number" id="height" min="1" max="20" value="2" minlength="1">
+          </div>
+          <div class="group">
+            <label for="auto">Auto</label>
+            <input type="checkbox" id="auto">
+          </div>
+        </div>
+
+        <div>
+          <div class="group">
+            <button id="start">Start</button>
+            <button id="stop">Stop</button>
+          </div>
+
+          <div class="group">
+            <button id="subtract-5">-5</button>
+            <button id="subtract-1">-1</button>
+            <input type="range" id="step" min="0" max="2" value="0">
+            <label id="step-label" for="step">0/2</label>
+            <button id="add-1">+1</button>
+            <button id="add-5">+5</button>
+          </div>
+
+          <div class="group">
+            <button id="reset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="canvas" width="800" height="500"></canvas>
+    </div>
+  </body>
+</html>
