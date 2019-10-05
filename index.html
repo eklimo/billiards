@@ -17,14 +17,10 @@
         <div>
           <div class="group">
             <label for="width">Width</label>
-            <input type="number" id="width" min="1" max="20" value="2" minlength="1">
+            <input type="number" id="width" min="1" value="2" minlength="1" step="any">
 
             <label for="height">Height</label>
-            <input type="number" id="height" min="1" max="20" value="2" minlength="1">
-          </div>
-          <div class="group">
-            <label for="auto">Auto</label>
-            <input type="checkbox" id="auto">
+            <input type="number" id="height" min="1" value="2" minlength="1" step="any">
           </div>
         </div>
 
@@ -35,12 +31,8 @@
           </div>
 
           <div class="group">
-            <button id="subtract-5">-5</button>
-            <button id="subtract-1">-1</button>
-            <input type="range" id="step" min="0" max="2" value="0">
-            <label id="step-label" for="step">0/2</label>
-            <button id="add-1">+1</button>
-            <button id="add-5">+5</button>
+            <input type="range" id="speed" min="0" max="25" value="10">
+            <label id="speed-label" for="speed">Speed: 1.0</label>
           </div>
 
           <div class="group">

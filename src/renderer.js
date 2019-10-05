@@ -39,15 +39,29 @@ function drawGrid() {
 
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = 'lightGray';
-  for (let x = 0; x < sim.width; x++) {
-    for (let y = 0; y < sim.height; y++) {
-      ctx.strokeRect(
-        offsetLeft + paddingLeft + x * squareSize,
-        offsetTop + paddingTop + y * squareSize,
-        squareSize,
-        squareSize
-      );
-    }
+  for (let x = 1; x < sim.width; x++) {
+    ctx.beginPath();
+    ctx.moveTo(
+      offsetLeft + paddingLeft + x * squareSize,
+      offsetTop + paddingTop + 0 * squareSize
+    );
+    ctx.lineTo(
+      offsetLeft + paddingLeft + x * squareSize,
+      offsetTop + paddingTop + sim.height * squareSize
+    );
+    ctx.stroke();
+  }
+  for (let y = 1; y < sim.height; y++) {
+    ctx.beginPath();
+    ctx.moveTo(
+      offsetLeft + paddingLeft + 0 * squareSize,
+      offsetTop + paddingTop + y * squareSize
+    );
+    ctx.lineTo(
+      offsetLeft + paddingLeft + sim.width * squareSize,
+      offsetTop + paddingTop + y * squareSize
+    );
+    ctx.stroke();
   }
 }
 
@@ -109,22 +123,36 @@ function drawHoles() {
   ctx.stroke();
 }
 
-function drawSteps() {
-  for (let i = 0; i < sim.steps.length; i++) {
-    const step = sim.steps[i];
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = sim.step > i ? 'gray' : 'lightGray';
+function drawPaths() {
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'gray';
+
+  // draw completed paths
+  for (let i = 0; i < sim.paths.length; i++) {
+    const path = sim.paths[i];
     ctx.beginPath();
     ctx.moveTo(
-      offsetLeft + paddingLeft + step.x1 * squareSize,
-      offsetTop + paddingTop + step.y1 * squareSize
+      offsetLeft + paddingLeft + path.x1 * squareSize,
+      offsetTop + paddingTop + path.y1 * squareSize
     );
     ctx.lineTo(
-      offsetLeft + paddingLeft + step.x2 * squareSize,
-      offsetTop + paddingTop + step.y2 * squareSize
+      offsetLeft + paddingLeft + path.x2 * squareSize,
+      offsetTop + paddingTop + path.y2 * squareSize
     );
     ctx.stroke();
   }
+
+  // draw current path
+  ctx.beginPath();
+  ctx.moveTo(
+    offsetLeft + paddingLeft + sim.bounceX * squareSize,
+    offsetTop + paddingTop + sim.bounceY * squareSize
+  );
+  ctx.lineTo(
+    offsetLeft + paddingLeft + sim.x * squareSize,
+    offsetTop + paddingTop + sim.y * squareSize
+  );
+  ctx.stroke();
 }
 
 function draw() {
@@ -132,13 +160,14 @@ function draw() {
 
   rescale();
   drawGrid();
-  drawSteps();
+  drawPaths();
   drawHoles();
   drawBall();
 }
-
 draw();
+
+export default { draw };
 
 sim.addListener(() => {
   draw();
-});
+}, 'init');

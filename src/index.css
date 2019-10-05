@@ -32,7 +32,7 @@ label {
 }
 
 input[type='number'] {
-  width: 40px;
+  width: 120px;
 }
 
 #container {

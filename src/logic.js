@@ -1,9 +1,8 @@
 let listeners = {
-  init: [],
-  step: []
+  init: []
 };
 
-class Step {
+class Path {
   constructor(x1, y1, x2, y2) {
     this.x1 = x1;
     this.y1 = y1;
@@ -12,40 +11,39 @@ class Step {
   }
 }
 
+function eq(a, b) {
+  return Math.abs(a - b) <= 1.0e-5;
+}
+function lte(a, b) {
+  return a < b || eq(a, b);
+}
+function gte(a, b) {
+  return a > b || eq(a, b);
+}
+
+const speedCoefficient = 0.005;
+
 class Simulation {
-  constructor(width, height, auto) {
+  constructor(width, height, speed) {
     this.width = width;
     this.height = height;
-    this.auto = auto;
+    this.speed = speed;
 
     this.reset();
   }
 
   reset() {
-    this.step = 0;
-    this.maxSteps = 0;
-    this.steps = [];
     this.done = false;
 
     this.x = 0;
     this.y = this.height;
     this.velocity = { x: 1, y: -1 };
-    // simulate to get max steps
-    while (!this.done) {
-      this.advance();
-      this.maxSteps++;
-    }
-    if (!this.auto) {
-      this.step = 0;
-      this.steps = [];
-      this.done = false;
-      this.x = 0;
-      this.y = this.height;
-      this.velocity = { x: 1, y: -1 };
-    }
+
+    this.paths = [];
+    this.bounceX = this.x;
+    this.bounceY = this.y;
 
     this.updateListeners('init');
-    this.updateListeners('step');
   }
 
   setWidth(width) {
@@ -58,64 +56,54 @@ class Simulation {
     this.reset();
   }
 
+  setSpeed(speed) {
+    this.speed = speed;
+  }
+
   advance() {
     if (!this.done) {
-      this.step++;
-
-      const prevX = this.x,
-        prevY = this.y;
-      this.x += this.velocity.x;
-      this.y += this.velocity.y;
-      this.steps.push(new Step(prevX, prevY, this.x, this.y));
+      this.x += this.velocity.x * this.speed * speedCoefficient;
+      this.y += this.velocity.y * this.speed * speedCoefficient;
 
       // check corner
       if (
-        (this.x == 0 && this.y == 0) ||
-        (this.x == 0 && this.y == this.height) ||
-        (this.x == this.width && this.y == 0) ||
-        (this.x == this.width && this.y == this.height)
+        (lte(this.x, 0) && lte(this.y, 0)) ||
+        (lte(this.x, 0) && gte(this.y, this.height)) ||
+        (gte(this.x, this.width) && lte(this.y, 0)) ||
+        (gte(this.x, this.width) && gte(this.y, this.height))
       ) {
         this.done = true;
+        return;
       }
 
-      // bounce vertical
-      else if (this.x == 0 || this.x == this.width) {
-        this.velocity.x *= -1;
+      // bounce
+      else {
+        let bounced = false;
+        
+        // bounce vertical
+        if (lte(this.x, 0)) {
+          this.velocity.x *= -1;
+          bounced = true;
+        } else if (gte(this.x, this.width)) {
+          this.velocity.x *= -1;
+          bounced = true;
+        }
+        // bounce horizontal
+        if (lte(this.y, 0)) {
+          this.velocity.y *= -1;
+          bounced = true;
+        } else if (gte(this.y, this.height)) {
+          this.velocity.y *= -1;
+          bounced = true;
+        }
+
+        if (bounced) {
+          this.paths.push(new Path(this.bounceX, this.bounceY, this.x, this.y));
+          this.bounceX = this.x;
+          this.bounceY = this.y;
+        }
       }
-
-      // bounce horizontal
-      else if (this.y == 0 || this.y == this.height) {
-        this.velocity.y *= -1;
-      }
-
-      this.updateListeners('step');
     }
-  }
-
-  undo() {
-    if (this.step > 0) {
-      const prev = this.steps.pop();
-      this.step--;
-      this.x = prev.x1;
-      this.y = prev.y1;
-      this.velocity.x = prev.x2 - prev.x1;
-      this.velocity.y = prev.y2 - prev.y1;
-      this.done = false;
-    } else {
-      this.done = true;
-    }
-  }
-
-  setStep(step) {
-    if (step < 0) step = 0;
-
-    if (this.step > step) {
-      while (this.step != step) this.undo();
-    } else {
-      while (this.step != step && !this.done) this.advance();
-    }
-
-    this.updateListeners('step');
   }
 
   addListener(listener, type) {
@@ -130,6 +118,6 @@ class Simulation {
   }
 }
 
-let sim = new Simulation(2, 2);
+let sim = new Simulation(2, 2, 10);
 
 export default sim;
